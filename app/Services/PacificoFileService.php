@@ -98,6 +98,7 @@ class PacificoFileService
             [
                 'Content-Type' => 'text/plain; charset=us-ascii',
                 'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                'X-Filename' => $filename,
             ]
         );
     }

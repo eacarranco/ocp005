@@ -380,31 +380,39 @@
 
     window.exportCobros = function() {
         const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
-        
+
+        const getFilenameFromResponse = response => {            const xFilename = response.headers.get('x-filename');
+            if (xFilename) {
+                return xFilename;
+            }
+            const disposition = response.headers.get('content-disposition') || '';
+            const matches = /filename="([^\"]+)"/.exec(disposition);
+            return matches ? matches[1] : 'cobros_pacifico.txt';
+        };
+
+        const downloadResponse = response => {
+            return response.blob().then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = getFilenameFromResponse(response);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                window.location.reload();
+            });
+        };
+
         if (selected.length > 0) {
             if (!confirm('¿Exportar solo los ' + selected.length + ' registros seleccionados?')) {
                 return;
             }
             fetch('{{ route("cobros.export") }}?tipo=seleccionados&ids=' + selected.join(','))
-            .then(response => response.blob())
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'cobros_pacifico_LOTE-' + new Date().toISOString().replace(/[-:]/g, '').slice(0, 15) + '.txt';
-                a.click();
-                window.URL.revokeObjectURL(url);
-                window.location.reload();
-            })
+            .then(response => downloadResponse(response))
             .catch(err => alert('Error: ' + err.message));
         } else {
-            const link = document.createElement('a');
-            link.href = '{{ route("cobros.export") }}?tipo=pendientes';
-            link.download = 'cobros_pacifico_LOTE-' + new Date().toISOString().replace(/[-:]/g, '').slice(0, 15) + '.txt';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            setTimeout(() => window.location.reload(), 1000);
+            fetch('{{ route("cobros.export") }}?tipo=pendientes')
+            .then(response => downloadResponse(response))
+            .catch(err => alert('Error: ' + err.message));
         }
     };
 })();

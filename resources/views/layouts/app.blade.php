@@ -505,15 +505,21 @@
         <aside class="sidebar">
             <nav class="sidebar-nav">
                 <li class="nav-item">
-                    <a href="{{ route('cobros.index') }}" class="nav-link {{ request()->routeIs('cobros.index') ? 'active' : '' }}">
-                        <i class="bi bi-list-ul"></i>
-                        <span>Listado de Cobros</span>
-                    </a>
-                </li>                
-                <li class="nav-item">
                     <a href="{{ route('consultar.index') }}" class="nav-link {{ request()->routeIs('consultar.*') ? 'active' : '' }}">
                         <i class="bi bi-database-fill-down"></i>
                         <span>Obtener</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('cobros.index') }}" class="nav-link {{ request()->routeIs('cobros.*') ? 'active' : '' }}">
+                        <i class="bi bi-list-ul"></i>
+                        <span>Listado de Cobros</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('envios.index') }}" class="nav-link {{ request()->routeIs('envios.*') ? 'active' : '' }}">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>Log envíos</span>
                     </a>
                 </li>
             </nav>
