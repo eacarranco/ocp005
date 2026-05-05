@@ -19,9 +19,9 @@
             <button type="button" class="btn btn-success btn-sm" onclick="exportCobros()">
                 <i class="bi bi-download"></i> Exportar TXT
             </button>
-            <a href="{{ route('envios.index') }}" class="btn btn-info btn-sm">
-                <i class="bi bi-file-earmark-text"></i> Log Envíos
-            </a>
+            <button type="button" class="btn btn-info btn-sm{{ request()->hasAny(['codigo_tercero', 'identificacion', 'nombre', 'tipo_id', 'valor_min', 'valor_max', 'fecha_creacion_inicio', 'fecha_creacion_fin', 'numero_lote']) ? '' : ' collapsed' }}" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="{{ request()->hasAny(['codigo_tercero', 'identificacion', 'nombre', 'tipo_id', 'valor_min', 'valor_max', 'fecha_creacion_inicio', 'fecha_creacion_fin', 'numero_lote']) ? 'true' : 'false' }}" aria-controls="filterCollapse">
+                <i class="bi bi-search"></i> Buscar
+            </button>
             <a href="{{ route('cobros.create') }}" class="btn btn-primary btn-sm">
                 <i class="bi bi-plus-circle"></i> Nuevo Cobro
             </a>
@@ -29,9 +29,11 @@
     </div>
     
     <div class="card-body">
-        <!-- Filtros de búsqueda -->
-        <form method="GET" action="{{ route('cobros.index') }}" class="mb-4">
-            <div class="row g-3 align-items-end">
+        <div class="collapse{{ request()->hasAny(['codigo_tercero', 'identificacion', 'nombre', 'tipo_id', 'valor_min', 'valor_max', 'fecha_creacion_inicio', 'fecha_creacion_fin', 'numero_lote']) ? ' show' : '' }}" id="filterCollapse">
+            <div class="card card-body mb-4 p-3">
+                <!-- Filtros de búsqueda -->
+                <form method="GET" action="{{ route('cobros.index') }}">
+                    <div class="row g-3 align-items-end">
                 <div class="col-md-2">
                     <label for="codigo_tercero" class="form-label">Código Tercero</label>
                     <input type="text" name="codigo_tercero" id="codigo_tercero" class="form-control" 
@@ -95,6 +97,8 @@
                 @endif
             </div>
         </form>
+            </div>
+        </div>
 
         <!-- Tabla de cobros -->
         @if($cobros->count() > 0)
