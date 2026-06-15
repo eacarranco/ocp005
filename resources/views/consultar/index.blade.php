@@ -31,12 +31,16 @@
                     <input type="date" name="fecha_fin" id="fecha_fin" class="form-control form-control-sm">
                 </div>
                 -->
+                @permission('consultar.obtener')
                 <div class="col-md-2">
                     <button type="button" id="btnObtener" class="btn btn-primary btn-sm w-100"><i class="bi bi-database"></i> Obtener</button>
                 </div>
+                @endpermission
+                @permission('consultar.guardar')
                 <div class="col-md-2">
                     <button type="button" id="btnGuardar" class="btn btn-success btn-sm w-100" disabled><i class="bi bi-save"></i> Guardar</button>
                 </div>
+                @endpermission
             </div>
         </form>
 

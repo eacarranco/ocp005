@@ -16,15 +16,19 @@
                 </select>
             </div>
             @endif
+            @permission('cobros.exportar-pendientes')
             <button type="button" class="btn btn-success btn-sm" onclick="exportCobros()">
                 <i class="bi bi-download"></i> Exportar TXT
             </button>
+            @endpermission
             <button type="button" class="btn btn-info btn-sm{{ request()->hasAny(['codigo_tercero', 'identificacion', 'nombre', 'tipo_id', 'valor_min', 'valor_max', 'fecha_creacion_inicio', 'fecha_creacion_fin', 'numero_lote']) ? '' : ' collapsed' }}" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="{{ request()->hasAny(['codigo_tercero', 'identificacion', 'nombre', 'tipo_id', 'valor_min', 'valor_max', 'fecha_creacion_inicio', 'fecha_creacion_fin', 'numero_lote']) ? 'true' : 'false' }}" aria-controls="filterCollapse">
                 <i class="bi bi-search"></i> Buscar
             </button>
+            @permission('cobros.ver')
             <a href="{{ route('cobros.create') }}" class="btn btn-primary btn-sm">
                 <i class="bi bi-plus-circle"></i> Nuevo Cobro
             </a>
+            @endpermission
         </div>
     </div>
     
@@ -103,12 +107,14 @@
         <!-- Tabla de cobros -->
         @if($cobros->count() > 0)
             <!-- Barra de acciones en lote -->
+            @permission('cobros.eliminar-masivo')
             <div class="mb-3 d-flex gap-2" id="bulkActionsBar" style="display: none;">
                 <span class="text-muted align-self-center" id="selectedCount">0 seleccionados</span>
                 <button type="button" class="btn btn-danger btn-sm" id="bulkDeleteBtn">
                     <i class="bi bi-trash"></i> Eliminar seleccionados
                 </button>
             </div>
+            @endpermission
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
@@ -207,11 +213,14 @@
                                             <i class="bi bi-three-dots-vertical"></i>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end">
+                                            @permission('cobros.editar')
                                             <li>
                                                 <a href="{{ route('cobros.edit', $cobro) }}" class="dropdown-item">
                                                     <i class="bi bi-pencil text-warning"></i> Editar
                                                 </a>
                                             </li>
+                                            @endpermission
+                                            @permission('cobros.eliminar')
                                             <li>
                                                 <form action="{{ route('cobros.destroy', $cobro) }}" method="POST" class="d-inline">
                                                     @csrf @method('DELETE')
@@ -220,6 +229,7 @@
                                                     </button>
                                                 </form>
                                             </li>
+                                            @endpermission
                                         </ul>
                                     </div>
                                 </td>
@@ -357,30 +367,32 @@
 
     setTimeout(updateBulkBar, 100);
 
-    bulkDeleteBtn.addEventListener('click', function() {
-        const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
-        if (selected.length === 0) return;
-        
-        if (confirm('¿Eliminar los ' + selected.length + ' registros seleccionados?')) {
-            fetch('{{ route("cobros.bulkDestroy") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ ids: selected })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.reload();
-                } else {
-                    alert(data.message || 'Error al eliminar');
-                }
-            })
-            .catch(err => alert('Error: ' + err.message));
-        }
-    });
+    if (bulkDeleteBtn) {
+        bulkDeleteBtn.addEventListener('click', function() {
+            const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
+            if (selected.length === 0) return;
+            
+            if (confirm('¿Eliminar los ' + selected.length + ' registros seleccionados?')) {
+                fetch('{{ route("cobros.bulkDestroy") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ ids: selected })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert(data.message || 'Error al eliminar');
+                    }
+                })
+                .catch(err => alert('Error: ' + err.message));
+            }
+        });
+    }
 
     window.exportCobros = function() {
         const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);

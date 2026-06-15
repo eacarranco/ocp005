@@ -44,15 +44,19 @@
                                 </td>
                                 <td>{{ $log->timestamp_generacion->format('d/m/Y H:i:s') }}</td>
                                 <td class="text-center">
+                                    @permission('envios.regenerar')
                                     <a href="{{ route('envios.regenerate', $log) }}" class="btn btn-primary btn-sm" title="Regenerar">
                                         <i class="bi bi-download"></i>
                                     </a>
+                                    @endpermission
+                                    @permission('envios.eliminar')
                                     <form action="{{ route('envios.destroy', $log) }}" method="POST" class="d-inline">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Deshacer este envío? Los registros serán liberados para un nuevo envío.')">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
+                                    @endpermission
                                 </td>
                             </tr>
                         @endforeach
