@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\PasswordExpiredController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\CobroPacificoController;
 use App\Http\Controllers\ConsultarController;
@@ -25,13 +27,17 @@ Route::post('logout', [LoginController::class, 'logout'])->name('logout')->middl
 
 Route::redirect('/', '/cobros');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'password.expired'])->group(function () {
+    Route::get('password/expired', [PasswordExpiredController::class, 'showExpiredForm'])->name('password.expired');
+    Route::post('password/expired', [PasswordExpiredController::class, 'updateExpired'])->name('password.expired.update');
 
     // Admin
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard')->middleware('permission:admin.roles.ver|admin.usuarios.ver');
         Route::resource('roles', RoleController::class)->except(['show'])->middleware('permission:admin.roles.*');
         Route::resource('usuarios', UserController::class)->except(['show'])->middleware('permission:admin.usuarios.*');
+        Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
+        Route::post('settings', [SettingsController::class, 'update'])->name('settings.update');
     });
 
     // Cobros

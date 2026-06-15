@@ -456,6 +456,35 @@
             font-weight: 500;
         }
 
+        /* Admin submenu */
+        .admin-submenu {
+            background-color: rgba(0,0,0,0.15);
+            padding: 0.25rem 0;
+        }
+        .admin-sub-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 1.5rem 0.6rem 2.5rem;
+            color: rgba(255,255,255,0.65);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        .admin-sub-link:hover {
+            background-color: rgba(255,255,255,0.08);
+            color: white;
+        }
+        .admin-sub-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.12);
+            font-weight: 600;
+        }
+        .admin-sub-link i {
+            font-size: 1rem;
+            min-width: 1.25rem;
+        }
+
         /* Responsive pagination */
         @media (max-width: 576px) {
             .pagination-wrapper {
@@ -503,12 +532,6 @@
             </a>
             @endpermission
             @auth
-            @permission('admin.roles.ver')
-            <a href="{{ route('admin.dashboard') }}" class="topbar-nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}">
-                <i class="bi bi-gear"></i>
-                <span>Admin</span>
-            </a>
-            @endpermission
             <span style="color:rgba(255,255,255,0.7);font-size:0.85rem;border-left:1px solid rgba(255,255,255,0.3);padding-left:1rem;">
                 {{ auth()->user()->name }}
             </span>
@@ -551,6 +574,30 @@
                     </a>
                 </li>
                 @endpermission
+                @if(auth()->user()->hasPermission('admin.roles.ver') || auth()->user()->hasPermission('admin.usuarios.ver'))
+                <li class="nav-item">
+                    <a href="#" class="nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}" onclick="toggleAdminMenu(event)">
+                        <i class="bi bi-gear"></i>
+                        <span>Administración</span>
+                        <i class="bi bi-chevron-down ms-auto" id="adminChevron"></i>
+                    </a>
+                    <div id="adminSubmenu" class="admin-submenu" style="{{ request()->routeIs('admin.*') ? 'display:block;' : 'display:none;' }}">
+                        @permission('admin.roles.ver')
+                        <a href="{{ route('admin.roles.index') }}" class="admin-sub-link {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
+                            <i class="bi bi-shield"></i> Roles
+                        </a>
+                        @endpermission
+                        @permission('admin.usuarios.ver')
+                        <a href="{{ route('admin.usuarios.index') }}" class="admin-sub-link {{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}">
+                            <i class="bi bi-people"></i> Usuarios
+                        </a>
+                        @endpermission
+                        <a href="{{ route('admin.settings.index') }}" class="admin-sub-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                            <i class="bi bi-gear"></i> Configuración
+                        </a>
+                    </div>
+                </li>
+                @endif
             </nav>
         </aside>
 
@@ -589,6 +636,20 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    function toggleAdminMenu(e) {
+        e.preventDefault();
+        var submenu = document.getElementById('adminSubmenu');
+        var chevron = document.getElementById('adminChevron');
+        if (submenu.style.display === 'block') {
+            submenu.style.display = 'none';
+            chevron.className = 'bi bi-chevron-down ms-auto';
+        } else {
+            submenu.style.display = 'block';
+            chevron.className = 'bi bi-chevron-up ms-auto';
+        }
+    }
+    </script>
     @stack('scripts')
 </body>
 </html>

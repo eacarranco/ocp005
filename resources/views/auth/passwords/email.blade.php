@@ -1,16 +1,13 @@
-@extends('layouts.app')
+@extends('layouts.auth')
 @section('title', 'Recuperar Contraseña - OCP-005')
 @section('content')
-<div class="row justify-content-center align-items-center" style="min-height: 60vh;">
+<div class="row justify-content-center">
     <div class="col-12 col-md-6 col-lg-4">
         <div class="card shadow">
             <div class="card-header text-center">
                 <h5 class="mb-0"><i class="bi bi-key"></i> Recuperar Contraseña</h5>
             </div>
             <div class="card-body">
-                @if(session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
                 <form method="POST" action="{{ route('password.email') }}">
                     @csrf
                     <div class="mb-3">

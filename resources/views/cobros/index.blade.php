@@ -162,7 +162,9 @@
                                     Fecha Lote <i class="bi bi-arrow-down-up"></i>
                                 </a>
                             </th>
-                            <th class="text-center">Acciones</th>
+                             @if(auth()->user()->hasPermission('cobros.editar') || auth()->user()->hasPermission('cobros.eliminar'))
+                                <th class="text-center">Acciones</th>
+                             @endif
                         </tr>
                     </thead>
                     <tbody>
@@ -207,6 +209,7 @@
                                         <span class="text-muted">-</span>
                                     @endif
                                 </td>
+                                @if(auth()->user()->hasPermission('cobros.editar') || auth()->user()->hasPermission('cobros.eliminar'))
                                 <td class="text-center">
                                     <div class="dropdown">
                                         <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -233,6 +236,7 @@
                                         </ul>
                                     </div>
                                 </td>
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>

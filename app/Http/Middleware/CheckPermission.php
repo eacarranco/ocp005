@@ -34,6 +34,10 @@ class CheckPermission
             }
         }
 
-        abort(403, 'No tienes permiso para realizar esta acción.');
+        if ($request->ajax() || $request->expectsJson()) {
+            return response()->json(['error' => 'No tienes permiso para realizar esta acción.'], 403);
+        }
+
+        return redirect()->back()->with('error', 'No tienes permiso para realizar esta acción.');
     }
 }

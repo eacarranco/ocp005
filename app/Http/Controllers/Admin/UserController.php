@@ -39,6 +39,8 @@ class UserController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
+        $user->storePasswordHistory();
+
         $user->roles()->attach($validated['roles']);
 
         return redirect()->route('admin.usuarios.index')
@@ -69,9 +71,15 @@ class UserController extends Controller
 
         if (!empty($validated['password'])) {
             $data['password'] = Hash::make($validated['password']);
+            $data['password_changed_at'] = null;
         }
 
         $usuario->update($data);
+
+        if (!empty($validated['password'])) {
+            $usuario->storePasswordHistory();
+        }
+
         $usuario->roles()->sync($validated['roles']);
 
         return redirect()->route('admin.usuarios.index')

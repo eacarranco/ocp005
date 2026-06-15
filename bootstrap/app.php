@@ -13,10 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'permission' => \App\Http\Middleware\CheckPermission::class,
+            'password.expired' => \App\Http\Middleware\CheckPasswordExpired::class,
         ]);
 
         $middleware->redirectGuestsTo('/login');
-        $middleware->redirectUsersTo('/cobros');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
