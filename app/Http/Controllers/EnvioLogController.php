@@ -18,28 +18,19 @@ class EnvioLogController extends Controller
 
     public function regenerate(EnvioLog $envio)
     {
-        if ($envio->registros_ids) {
-            $ids = explode(',', $envio->registros_ids);
-            $cobros = CobroPacifico::whereIn('id', $ids)->get();
-            
-            if ($cobros->isNotEmpty()) {
-                $fileService = app(\App\Services\PacificoFileService::class);
-                return $fileService->generateAndDownload($cobros, $envio->filename);
-            }
+        $cobros = $envio->cobros;
+
+        if ($cobros->isNotEmpty()) {
+            $fileService = app(\App\Services\PacificoFileService::class);
+            return $fileService->generateAndDownload($cobros, $envio->filename);
         }
-        
+
         return back()->with('error', 'No se encontraron registros para regenerar');
     }
 
     public function destroy(EnvioLog $envio)
     {
-        if ($envio->registros_ids) {
-            $ids = explode(',', $envio->registros_ids);
-            CobroPacifico::whereIn('id', $ids)->update([
-                'numero_lote' => null,
-                'fecha_lote' => null,
-            ]);
-        }
+        $envio->cobros()->update(['envio_logs_id' => null]);
 
         $envio->delete();
 

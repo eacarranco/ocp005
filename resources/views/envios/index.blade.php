@@ -31,8 +31,8 @@
                                     <strong>{{ $log->numero_lote }}</strong>
                                 </td>
                                 <td>
-                                    @if($log->tipo_envio === 'todos')
-                                        <span class="badge bg-primary">Todos</span>
+                                    @if($log->tipo_envio === 'pendientes')
+                                        <span class="badge bg-primary">Pendientes</span>
                                     @else
                                         <span class="badge bg-warning text-dark">Seleccionados</span>
                                     @endif

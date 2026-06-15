@@ -15,11 +15,15 @@ class EnvioLog extends Model
         'total_registros',
         'filename',
         'tipo_envio',
-        'registros_ids',
     ];
 
     protected $casts = [
         'timestamp_generacion' => 'datetime',
         'valor_total' => 'decimal:2',
     ];
+
+    public function cobros()
+    {
+        return $this->hasMany(CobroPacifico::class, 'envio_logs_id');
+    }
 }

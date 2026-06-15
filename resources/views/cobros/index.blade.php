@@ -163,8 +163,8 @@
                         @foreach($cobros as $cobro)
                             <tr>
                                 <td>
-                                    @if($cobro->numero_lote)
-                                        <input type="checkbox" class="form-check-input" disabled title="Ya enviado en lote {{ $cobro->numero_lote }}">
+                                    @if($cobro->envio_logs_id)
+                                        <input type="checkbox" class="form-check-input" disabled title="Ya enviado en lote {{ $cobro->envioLog?->numero_lote }}">
                                     @else
                                         <input type="checkbox" class="form-check-input row-checkbox" value="{{ $cobro->id }}">
                                     @endif
@@ -188,15 +188,15 @@
                                     <small class="text-muted">{{ $cobro->created_at->format('d/m/Y H:i') }}</small>
                                 </td>
                                 <td>
-                                    @if($cobro->numero_lote)
-                                        <span class="badge bg-success">{{ $cobro->numero_lote }}</span>
+                                    @if($cobro->envioLog)
+                                        <span class="badge bg-success">{{ $cobro->envioLog->numero_lote }}</span>
                                     @else
                                         <span class="text-muted">-</span>
                                     @endif
                                 </td>
                                 <td>
-                                    @if($cobro->fecha_lote)
-                                        <small class="text-muted">{{ $cobro->fecha_lote->format('d/m/Y H:i') }}</small>
+                                    @if($cobro->envioLog)
+                                        <small class="text-muted">{{ $cobro->envioLog->timestamp_generacion->format('d/m/Y H:i') }}</small>
                                     @else
                                         <span class="text-muted">-</span>
                                     @endif
@@ -385,7 +385,10 @@
     window.exportCobros = function() {
         const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
 
-        const getFilenameFromResponse = response => {            const xFilename = response.headers.get('x-filename');
+        const headers = { 'X-Requested-With': 'XMLHttpRequest' };
+
+        const getFilenameFromResponse = response => {
+            const xFilename = response.headers.get('x-filename');
             if (xFilename) {
                 return xFilename;
             }
@@ -395,6 +398,13 @@
         };
 
         const downloadResponse = response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    alert(data.error || 'Error al exportar');
+                }).catch(() => {
+                    alert('Error al exportar: no hay registros disponibles');
+                });
+            }
             return response.blob().then(blob => {
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -410,11 +420,11 @@
             if (!confirm('¿Exportar solo los ' + selected.length + ' registros seleccionados?')) {
                 return;
             }
-            fetch('{{ route("cobros.export") }}?tipo=seleccionados&ids=' + selected.join(','))
+            fetch('{{ route("cobros.export") }}?tipo=seleccionados&ids=' + selected.join(','), { headers })
             .then(response => downloadResponse(response))
             .catch(err => alert('Error: ' + err.message));
         } else {
-            fetch('{{ route("cobros.export") }}?tipo=pendientes')
+            fetch('{{ route("cobros.export") }}?tipo=pendientes', { headers })
             .then(response => downloadResponse(response))
             .catch(err => alert('Error: ' + err.message));
         }

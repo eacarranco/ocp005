@@ -6,6 +6,7 @@ use App\Models\CobroPacifico;
 use App\Models\EnvioLog;
 use App\Services\PacificoFileService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -18,7 +19,7 @@ class CobroPacificoController extends Controller
 
     public function index(Request $request): View
     {
-        $query = CobroPacifico::query();
+        $query = CobroPacifico::with('envioLog');
 
         if ($request->has('codigo_tercero') && $request->codigo_tercero) {
             $query->where('codigo_tercero', 'like', '%' . $request->codigo_tercero . '%');
@@ -53,7 +54,9 @@ class CobroPacificoController extends Controller
         }
 
         if ($request->has('numero_lote') && $request->numero_lote) {
-            $query->where('numero_lote', 'like', '%' . $request->numero_lote . '%');
+            $query->whereHas('envioLog', function ($q) use ($request) {
+                $q->where('numero_lote', 'like', '%' . $request->numero_lote . '%');
+            });
         }
 
         $sortField = $request->input('sort', 'created_at');
@@ -64,8 +67,22 @@ class CobroPacificoController extends Controller
             $sortField = 'created_at';
         }
 
+        if ($sortField === 'numero_lote') {
+            $query->orderBy(
+                EnvioLog::select('numero_lote')->whereColumn('envio_logs.id', 'cobros_pacifico.envio_logs_id'),
+                $sortDirection
+            );
+        } elseif ($sortField === 'fecha_lote') {
+            $query->orderBy(
+                EnvioLog::select('timestamp_generacion')->whereColumn('envio_logs.id', 'cobros_pacifico.envio_logs_id'),
+                $sortDirection
+            );
+        } else {
+            $query->orderBy($sortField, $sortDirection);
+        }
+
         $perPage = $request->input('per_page', 10);
-        $cobros = $query->orderBy($sortField, $sortDirection)->paginate($perPage)->withQueryString();
+        $cobros = $query->paginate($perPage)->withQueryString();
 
         return view('cobros.index', compact('cobros'));
     }
@@ -105,6 +122,11 @@ class CobroPacificoController extends Controller
 
     public function destroy(CobroPacifico $cobro)
     {
+        if ($cobro->envio_logs_id) {
+            return redirect()->route('cobros.index')
+                ->with('error', 'No se puede eliminar un cobro que ya fue exportado en un lote.');
+        }
+
         $cobro->delete();
         return redirect()->route('cobros.index')
             ->with('success', 'Cobro eliminado exitosamente.');
@@ -117,6 +139,11 @@ class CobroPacificoController extends Controller
 
     public function update(Request $request, CobroPacifico $cobro)
     {
+        if ($cobro->envio_logs_id) {
+            return redirect()->route('cobros.index')
+                ->with('error', 'No se puede editar un cobro que ya fue exportado en un lote.');
+        }
+
         $validated = $request->validate(CobroPacifico::rules(), CobroPacifico::messages());
         $validated = CobroPacifico::normalizeData($validated);
 
@@ -155,9 +182,9 @@ class CobroPacificoController extends Controller
             }
 
             if ($tipo === 'seleccionados' && !empty($ids)) {
-                $cobros = CobroPacifico::whereIn('id', $ids)->get();
+                $cobros = CobroPacifico::whereIn('id', $ids)->whereNull('envio_logs_id')->get();
             } else {
-                $cobros = CobroPacifico::whereNull('numero_lote')->get();
+                $cobros = CobroPacifico::whereNull('envio_logs_id')->get();
             }
 
             if ($cobros->isEmpty()) {
@@ -173,20 +200,20 @@ class CobroPacificoController extends Controller
             $timestamp = now();
             $filename = 'cobros_pacifico_' . $numeroLote . '.txt';
 
-            EnvioLog::create([
-                'numero_lote' => $numeroLote,
-                'timestamp_generacion' => $timestamp,
-                'valor_total' => $valorTotal,
-                'total_registros' => $totalRegistros,
-                'filename' => $filename,
-                'tipo_envio' => $tipo,
-                'registros_ids' => $cobros->pluck('id')->implode(','),
-            ]);
+            DB::transaction(function () use ($cobros, $numeroLote, $timestamp, $valorTotal, $totalRegistros, $filename, $tipo) {
+                $envioLog = EnvioLog::create([
+                    'numero_lote' => $numeroLote,
+                    'timestamp_generacion' => $timestamp,
+                    'valor_total' => $valorTotal,
+                    'total_registros' => $totalRegistros,
+                    'filename' => $filename,
+                    'tipo_envio' => $tipo,
+                ]);
 
-            CobroPacifico::whereIn('id', $cobros->pluck('id'))->update([
-                'numero_lote' => $numeroLote,
-                'fecha_lote' => $timestamp,
-            ]);
+                CobroPacifico::whereIn('id', $cobros->pluck('id'))->update([
+                    'envio_logs_id' => $envioLog->id,
+                ]);
+            });
 
             return $this->fileService->generateAndDownload($cobros, $filename);
         } catch (\Exception $e) {
@@ -206,6 +233,11 @@ class CobroPacificoController extends Controller
         
         if (empty($ids)) {
             return response()->json(['success' => false, 'message' => 'No hay registros seleccionados']);
+        }
+
+        $exported = CobroPacifico::whereIn('id', $ids)->whereNotNull('envio_logs_id')->count();
+        if ($exported > 0) {
+            return response()->json(['success' => false, 'message' => 'No se pueden eliminar registros que ya fueron exportados en un lote.']);
         }
 
         CobroPacifico::whereIn('id', $ids)->delete();

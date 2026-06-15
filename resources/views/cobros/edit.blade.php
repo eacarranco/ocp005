@@ -26,15 +26,6 @@
                             <h6 class="border-bottom pb-2 mb-3 text-primary"><i class="bi bi-credit-card"></i> Datos de Cuenta</h6>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Tipo de Cuenta</label>
-                            <select name="tipo_cuenta" class="form-select">
-                                <option value="">-- Sin cuenta --</option>
-                                <option value="00" {{ $cobro->tipo_cuenta=='00'?'selected':'' }}>00 - Cuenta de Ahorros</option>
-                                <option value="10" {{ $cobro->tipo_cuenta=='10'?'selected':'' }}>10 - Cuenta Corriente</option>
-                            </select>
-                            <small class="text-muted">Posicion 7-8 (2 chars)</small>
-                        </div>
-                        <div class="col-md-6">
                             <label class="form-label">Numero de Cuenta</label>
                             <input type="text" name="numero_cuenta" class="form-control" value="{{ old('numero_cuenta', $cobro->numero_cuenta) }}" maxlength="10" placeholder="10 digitos">
                             <small class="text-muted">Posicion 7-16 (10 chars)</small>

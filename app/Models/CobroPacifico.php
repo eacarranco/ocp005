@@ -18,8 +18,7 @@ class CobroPacifico extends Model
         'valor',
         'codigo_tercero',
         'referencia',
-        'numero_lote',
-        'fecha_lote',
+        'envio_logs_id',
         'forma_pago',
         'moneda',
         'nombre_tercero',
@@ -32,9 +31,7 @@ class CobroPacifico extends Model
         'base_imponible_bienes',
     ];
 
-    protected $casts = [
-        'fecha_lote' => 'datetime',
-    ];
+    protected $casts = [];
 
     public static function rules(): array
     {
@@ -99,6 +96,11 @@ class CobroPacifico extends Model
             'identificacion.required' => 'La identificacion es obligatoria',
             'identificacion.string' => 'La identificacion debe ser un texto valido',
         ];
+    }
+
+    public function envioLog()
+    {
+        return $this->belongsTo(EnvioLog::class, 'envio_logs_id');
     }
 
     public static function asciiNormalize(string $value): string
