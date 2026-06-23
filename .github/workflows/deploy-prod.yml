@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Trigger deploy webhook
         run: |
-          curl -s -X POST \
+          curl -v -X POST \
             -d "token=${{ secrets.DEPLOY_TOKEN }}" \
-            https://pagos.rpcayambe.gob.ec/deploy-hook.php
+            --connect-timeout 10 \
+            --max-time 30 \
+            https://pagos.rpcayambe.gob.ec/deploy-hook.php 2>&1
