@@ -12,7 +12,7 @@
     <style>
         :root { --primary: #0d6efd; --primary-dark: #0b5ed7; }
         body {
-            background: #ffffff;
+            background: linear-gradient(135deg, #0d6efd 0%, #6610f2 50%, #6f42c1 100%);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
             min-height: 100vh;
             display: flex;
