@@ -152,6 +152,7 @@
                                     Fecha Creación <i class="bi bi-arrow-down-up"></i>
                                 </a>
                             </th>
+                            <th>Usuario</th>
                             <th>
                                 <a href="{{ request()->fullUrlWithQuery(['sort' => 'numero_lote', 'direction' => request('sort') == 'numero_lote' && request('direction') == 'asc' ? 'desc' : 'asc']) }}" class="text-decoration-none text-dark">
                                     N° Lote <i class="bi bi-arrow-down-up"></i>
@@ -194,6 +195,13 @@
                                 </td>
                                 <td>
                                     <small class="text-muted">{{ $cobro->created_at->format('d/m/Y H:i') }}</small>
+                                </td>
+                                <td>
+                                    @if($cobro->createdBy)
+                                        <small class="text-muted">{{ $cobro->createdBy->name }}</small>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
                                 </td>
                                 <td>
                                     @if($cobro->envioLog)

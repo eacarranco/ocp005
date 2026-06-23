@@ -23,7 +23,7 @@ Route::middleware('guest')->group(function () {
     Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
 });
 
-Route::post('logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
+Route::match(['get', 'post'], 'logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
 Route::redirect('/', '/cobros');
 

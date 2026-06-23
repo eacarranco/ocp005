@@ -11,7 +11,7 @@ class EnvioLogController extends Controller
 {
     public function index(Request $request): View
     {
-        $logs = EnvioLog::orderBy('created_at', 'desc')->paginate(10);
+        $logs = EnvioLog::with('createdBy')->orderBy('created_at', 'desc')->paginate(10);
 
         return view('envios.index', compact('logs'));
     }

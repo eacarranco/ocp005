@@ -29,6 +29,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
+            'force_password_change' => 'nullable|boolean',
             'roles' => 'required|array',
             'roles.*' => 'exists:roles,id',
         ]);
@@ -40,6 +41,11 @@ class UserController extends Controller
         ]);
 
         $user->storePasswordHistory();
+
+        if (!($validated['force_password_change'] ?? true)) {
+            $user->password_changed_at = now();
+            $user->save();
+        }
 
         $user->roles()->attach($validated['roles']);
 
@@ -60,6 +66,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($usuario->id)],
             'password' => 'nullable|string|min:8|confirmed',
+            'force_password_change' => 'nullable|boolean',
             'roles' => 'required|array',
             'roles.*' => 'exists:roles,id',
         ]);
@@ -71,8 +78,9 @@ class UserController extends Controller
 
         if (!empty($validated['password'])) {
             $data['password'] = Hash::make($validated['password']);
-            $data['password_changed_at'] = null;
         }
+
+        $data['password_changed_at'] = ($validated['force_password_change'] ?? false) ? null : now();
 
         $usuario->update($data);
 

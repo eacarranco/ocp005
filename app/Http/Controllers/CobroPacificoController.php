@@ -19,7 +19,7 @@ class CobroPacificoController extends Controller
 
     public function index(Request $request): View
     {
-        $query = CobroPacifico::with('envioLog');
+        $query = CobroPacifico::with(['envioLog', 'createdBy']);
 
         if ($request->has('codigo_tercero') && $request->codigo_tercero) {
             $query->where('codigo_tercero', 'like', '%' . $request->codigo_tercero . '%');

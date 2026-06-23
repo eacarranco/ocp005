@@ -43,6 +43,12 @@
                     </div>
                 </div>
                 <div class="col-12">
+                    <div class="form-check">
+                        <input type="checkbox" name="force_password_change" value="1" class="form-check-input" id="force_password_change" {{ is_null($usuario->password_changed_at) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="force_password_change">Cambiar contraseña en próximo inicio</label>
+                    </div>
+                </div>
+                <div class="col-12">
                     <a href="{{ route('admin.usuarios.index') }}" class="btn btn-secondary">Cancelar</a>
                     <button type="submit" class="btn btn-primary">Actualizar Usuario</button>
                 </div>

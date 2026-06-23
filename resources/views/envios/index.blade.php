@@ -21,6 +21,7 @@
                             <th>Valor Total</th>
                             <th>Archivo</th>
                             <th>Fecha Generación</th>
+                            <th>Usuario</th>
                             <th class="text-center">Acciones</th>
                         </tr>
                     </thead>
@@ -43,6 +44,13 @@
                                     <small class="text-muted">{{ $log->filename }}</small>
                                 </td>
                                 <td>{{ $log->timestamp_generacion->format('d/m/Y H:i:s') }}</td>
+                                <td>
+                                    @if($log->createdBy)
+                                        <small class="text-muted">{{ $log->createdBy->name }}</small>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
                                 <td class="text-center">
                                     @permission('envios.regenerar')
                                     <a href="{{ route('envios.regenerate', $log) }}" class="btn btn-primary btn-sm" title="Regenerar">
