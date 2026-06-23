@@ -515,24 +515,6 @@
         </a>
         <div class="topbar-spacer"></div>
         <nav class="topbar-nav">
-            @permission('consultar.ver')
-            <a href="{{ route('consultar.index') }}" class="topbar-nav-link {{ request()->routeIs('consultar.*') ? 'active' : '' }}">
-                <i class="bi bi-database-fill-down"></i>
-                <span>Obtener</span>
-            </a>
-            @endpermission
-            @permission('cobros.listar')
-            <a href="{{ route('cobros.index') }}" class="topbar-nav-link {{ request()->routeIs('cobros.*') ? 'active' : '' }}">
-                <i class="bi bi-list-ul"></i>
-                <span>Listado de Cobros</span>
-            </a>
-            @endpermission
-            @permission('envios.listar')
-            <a href="{{ route('envios.index') }}" class="topbar-nav-link {{ request()->routeIs('envios.*') ? 'active' : '' }}">
-                <i class="bi bi-file-earmark-text"></i>
-                <span>Log de Envíos</span>
-            </a>
-            @endpermission
             @auth
             <span style="color:rgba(255,255,255,0.7);font-size:0.85rem;border-left:1px solid rgba(255,255,255,0.3);padding-left:1rem;">
                 {{ auth()->user()->name }}
