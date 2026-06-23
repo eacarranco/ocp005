@@ -16,4 +16,5 @@ jobs:
             -d "token=${{ secrets.DEPLOY_TOKEN }}" \
             --connect-timeout 10 \
             --max-time 30 \
+            --resolve "pagos.rpcayambe.gob.ec:443:186.46.221.154" \
             https://pagos.rpcayambe.gob.ec/deploy-hook.php 2>&1
