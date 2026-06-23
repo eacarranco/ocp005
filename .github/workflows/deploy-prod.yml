@@ -13,6 +13,5 @@ jobs:
       - name: Trigger deploy webhook
         run: |
           curl -s -X POST \
-            -H "X-Deploy-Token: ${{ secrets.DEPLOY_TOKEN }}" \
-            -H "Content-Type: application/json" \
+            -d "token=${{ secrets.DEPLOY_TOKEN }}" \
             https://pagos.rpcayambe.gob.ec/deploy-hook.php
