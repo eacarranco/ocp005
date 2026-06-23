@@ -198,7 +198,7 @@ class CobroPacificoController extends Controller
             $totalRegistros = $cobros->count();
             $numeroLote = 'LOTE-' . date('YmdHis');
             $timestamp = now();
-            $filename = 'cobros_pacifico_' . $numeroLote . '.txt';
+            $filename = $numeroLote . '.txt';
 
             DB::transaction(function () use ($cobros, $numeroLote, $timestamp, $valorTotal, $totalRegistros, $filename, $tipo) {
                 $envioLog = EnvioLog::create([
